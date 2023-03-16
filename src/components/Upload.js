@@ -1,0 +1,125 @@
+import React, { useCallback, useState } from "react";
+import { Button } from "react-daisyui";
+
+import { useDropzone } from "react-dropzone";
+import Share from "./Share";
+
+function Upload() {
+  const [file, setfile] = useState("No File Chosen");
+  const [btntxt, setbtntxt] = useState("Upload File");
+  const [dwnldLink, setDwnldLink] = useState("");
+  const [id, setId] = useState("");
+  const [shareplace, setShareplace] = useState("");
+
+  const onDrop = useCallback(async (acceptedFiles) => {
+    if (!acceptedFiles) return {};
+
+    setfile(acceptedFiles[0]["name"]);
+    setbtntxt("Get Download Link");
+    console.log(acceptedFiles);
+    let formdata = new FormData();
+    formdata.append("Myfile", acceptedFiles[0]);
+    fetch("http://localhost:5000/api/upload/", {
+      method: "POST",
+      body: formdata,
+    })
+      .then((resp) => {
+        return resp.json();
+      })
+      .then((data) => {
+        console.log(data);
+        setId(data._id);
+      })
+      .catch((error) => console.log(error));
+
+    console.log(formdata);
+  }, []);
+
+  const { getRootProps, getInputProps } = useDropzone({
+    onDrop,
+    multiple: false,
+    accept: {
+      "image/png": [".png"],
+      "image/jpeg": [".jpeg", "jpg"],
+      "audio/mpeg": [".mp3", ".mpeg"],
+      "text/plain": [".txt"],
+      "image/jpg": [".jpg"],
+    },
+  });
+  const handlerClick = (e) => {
+    fetch(`http://localhost:5000/api/upload/${id}`, {
+      method: "GET",
+    })
+      .then((res) => {
+        return res.json();
+      })
+      .then((data) => {
+        setDwnldLink(data);
+      })
+      .catch((error) => console.log(error));
+    console.log({ dwnldLink });
+  };
+  const ShareClick = () => {
+    setShareplace(<Share dwnldLink={dwnldLink}></Share>);
+  };
+  return (
+    <div className=" bg-white flex justify-center items-center h-screen ">
+      <div className="card w-96 ">
+        <figure className="py-5 pt-10">
+          <img
+            src="https://placeimg.com/400/225/arch"
+            alt="Shoes"
+            className="rounded-xl"
+          />
+        </figure>
+        <div className="card-body items-center text-center text-black">
+          <h2 className="card-title">Upload and Share</h2>
+          <p className="my-2">Upload File in .jpg/.jpeg/.pdf/.txt Format </p>
+          <p>{file}</p>
+          <div className="card-actions">
+            {file === "No File Chosen" ? (
+              <div {...getRootProps()}>
+                <input {...getInputProps()} />
+                <Button className="btn btn-primary w-96 my-2">{btntxt}</Button>
+              </div>
+            ) : (
+              ""
+            )}
+          </div>
+          {dwnldLink.length > 0 ? (
+            <a
+              href={dwnldLink}
+              target="_blank"
+              rel="noreferrer"
+              className="link link-secondary my-2"
+            >
+              Click here to Download
+            </a>
+          ) : (
+            ""
+          )}
+          {file !== "No File Chosen" && dwnldLink.length === 0 ? (
+            <Button className="btn btn-primary w-96 my-2" onClick={handlerClick}>
+              {btntxt}
+            </Button>
+          ) : (
+            ""
+          )}
+          {dwnldLink.length > 0 ? (
+            <Button className="btn btn-primary w-96 my-2" onClick={ShareClick}>
+              Share
+            </Button>
+          ) : (
+            ""
+          )}
+
+
+        </div>
+        <p>{shareplace}</p>
+      </div>
+
+    </div>
+  );
+}
+
+export default Upload;
