@@ -19,7 +19,7 @@ function Upload() {
     console.log(acceptedFiles);
     let formdata = new FormData();
     formdata.append("Myfile", acceptedFiles[0]);
-    fetch("http://localhost:5000/api/upload/", {
+    fetch("https://fileshare-api.onrender.com/api/upload/", {
       method: "POST",
       body: formdata,
     })
@@ -47,7 +47,7 @@ function Upload() {
     },
   });
   const handlerClick = (e) => {
-    fetch(`http://localhost:5000/api/upload/${id}`, {
+    fetch(`https://fileshare-api.onrender.com/api/upload/${id}`, {
       method: "GET",
     })
       .then((res) => {
