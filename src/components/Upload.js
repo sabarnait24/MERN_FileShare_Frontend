@@ -3,6 +3,7 @@ import { Button } from "react-daisyui";
 
 import { useDropzone } from "react-dropzone";
 import Share from "./Share";
+import Spinner from "./Spinner";
 
 function Upload() {
   const [file, setfile] = useState("No File Chosen");
@@ -10,6 +11,7 @@ function Upload() {
   const [dwnldLink, setDwnldLink] = useState("");
   const [id, setId] = useState("");
   const [shareplace, setShareplace] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const onDrop = useCallback(async (acceptedFiles) => {
     if (!acceptedFiles) return {};
@@ -19,7 +21,7 @@ function Upload() {
     console.log(acceptedFiles);
     let formdata = new FormData();
     formdata.append("Myfile", acceptedFiles[0]);
-    fetch("https://fileshare-api.onrender.com/api/upload/", {
+    fetch(" https://fileshare-api.onrender.com/api/upload/", {
       method: "POST",
       body: formdata,
     })
@@ -27,7 +29,7 @@ function Upload() {
         return resp.json();
       })
       .then((data) => {
-        console.log(data);
+        // console.log(data);
         setId(data._id);
       })
       .catch((error) => console.log(error));
@@ -46,8 +48,11 @@ function Upload() {
       "image/jpg": [".jpg"],
     },
   });
-  const handlerClick = (e) => {
-    fetch(`https://fileshare-api.onrender.com/api/upload/${id}`, {
+ 
+  const handlerClick = async (e) => {
+    setLoading(true);
+    console.log({ loading });
+    await fetch(` https://fileshare-api.onrender.com/api/upload/${id}`, {
       method: "GET",
     })
       .then((res) => {
@@ -55,9 +60,11 @@ function Upload() {
       })
       .then((data) => {
         setDwnldLink(data);
+        setLoading(false);
       })
       .catch((error) => console.log(error));
-    console.log({ dwnldLink });
+    setLoading(false);
+    console.log({ loading });
   };
   const ShareClick = () => {
     setShareplace(<Share dwnldLink={dwnldLink}></Share>);
@@ -76,48 +83,59 @@ function Upload() {
           <h2 className="card-title">Upload and Share</h2>
           <p className="my-2">Upload File in .jpg/.jpeg/.pdf/.txt Format </p>
           <p>{file}</p>
-          <div className="card-actions">
-            {file === "No File Chosen" ? (
-              <div {...getRootProps()}>
-                <input {...getInputProps()} />
-                <Button className="btn btn-primary w-96 my-2">{btntxt}</Button>
+          {loading === true ? (
+            <Spinner />
+          ) : (
+            <div className="my-2">
+              <div className="card-actions">
+                {file === "No File Chosen" ? (
+                  <div {...getRootProps()}>
+                    <input {...getInputProps()} />
+                    <Button className="btn btn-primary w-96 my-2">
+                      {btntxt}
+                    </Button>
+                  </div>
+                ) : (
+                  ""
+                )}
               </div>
-            ) : (
-              ""
-            )}
-          </div>
-          {dwnldLink.length > 0 ? (
-            <a
-              href={dwnldLink}
-              target="_blank"
-              rel="noreferrer"
-              className="link link-secondary my-2"
-            >
-              Click here to Download
-            </a>
-          ) : (
-            ""
+              {dwnldLink.length > 0 ? (
+                <a
+                  href={dwnldLink}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="link link-secondary my-2"
+                >
+                  Click here to Download
+                </a>
+              ) : (
+                ""
+              )}
+              {file !== "No File Chosen" && dwnldLink.length === 0 ? (
+                <Button
+                  className="btn btn-primary w-96 my-2"
+                  onClick={handlerClick}
+                >
+                  {btntxt}
+                </Button>
+              ) : (
+                ""
+              )}
+              {dwnldLink.length > 0 ? (
+                <Button
+                  className="btn btn-primary w-96 my-2"
+                  onClick={ShareClick}
+                >
+                  Share
+                </Button>
+              ) : (
+                ""
+              )}
+            </div>
           )}
-          {file !== "No File Chosen" && dwnldLink.length === 0 ? (
-            <Button className="btn btn-primary w-96 my-2" onClick={handlerClick}>
-              {btntxt}
-            </Button>
-          ) : (
-            ""
-          )}
-          {dwnldLink.length > 0 ? (
-            <Button className="btn btn-primary w-96 my-2" onClick={ShareClick}>
-              Share
-            </Button>
-          ) : (
-            ""
-          )}
-
-
         </div>
         <p>{shareplace}</p>
       </div>
-
     </div>
   );
 }
