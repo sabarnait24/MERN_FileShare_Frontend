@@ -4,7 +4,7 @@ import spin from './spin.gif'
 function Spinner() {
   return (
     <div>
-      <img src={spin} alt='loading...'></img>
+      <img src={spin} style={{height:"100px",width:"100px"}} alt='loading...'></img>
     </div>
   )
 }
