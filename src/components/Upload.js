@@ -9,19 +9,19 @@ function Upload() {
   const [file, setfile] = useState("No File Chosen");
   const [btntxt, setbtntxt] = useState("Upload File");
   const [dwnldLink, setDwnldLink] = useState("");
-  const [id, setId] = useState("");
   const [shareplace, setShareplace] = useState("");
   const [loading, setLoading] = useState(false);
 
   const onDrop = useCallback(async (acceptedFiles) => {
     if (!acceptedFiles) return {};
-
-    setfile(acceptedFiles[0]["name"]);
+    setLoading(true);
+    setfile(acceptedFiles[0].name);
     setbtntxt("Get Download Link");
     console.log(acceptedFiles);
     let formdata = new FormData();
+    
     formdata.append("Myfile", acceptedFiles[0]);
-    fetch(" https://fileshare-api.onrender.com/api/upload/", {
+    fetch("https://fileshare-api.onrender.com/api/upload", {
       method: "POST",
       body: formdata,
     })
@@ -30,42 +30,20 @@ function Upload() {
       })
       .then((data) => {
         // console.log(data);
-        setId(data._id);
+        setDwnldLink(data.urlLink);
+        setLoading(false);
       })
       .catch((error) => console.log(error));
 
-    console.log(formdata);
+    // console.log(formdata);
   }, []);
 
   const { getRootProps, getInputProps } = useDropzone({
     onDrop,
     multiple: false,
-    accept: {
-      "image/png": [".png"],
-      "image/jpeg": [".jpeg", "jpg"],
-      "audio/mpeg": [".mp3", ".mpeg"],
-      "text/plain": [".txt"],
-      "image/jpg": [".jpg"],
-    },
+   
   });
  
-  const handlerClick = async (e) => {
-    setLoading(true);
-    console.log({ loading });
-    await fetch(` https://fileshare-api.onrender.com/api/upload/${id}`, {
-      method: "GET",
-    })
-      .then((res) => {
-        return res.json();
-      })
-      .then((data) => {
-        setDwnldLink(data);
-        setLoading(false);
-      })
-      .catch((error) => console.log(error));
-    setLoading(false);
-    console.log({ loading });
-  };
   const ShareClick = () => {
     setShareplace(<Share dwnldLink={dwnldLink}></Share>);
   };
@@ -99,7 +77,8 @@ function Upload() {
                   ""
                 )}
               </div>
-              {dwnldLink.length > 0 ? (
+              {file!=="No File Chosen" && dwnldLink!=="" ? (
+                <div>
                 <a
                   href={dwnldLink}
                   target="_blank"
@@ -108,29 +87,17 @@ function Upload() {
                 >
                   Click here to Download
                 </a>
+                 <Button
+                 className="btn btn-primary w-96 my-2"
+                 onClick={ShareClick}
+               >
+                 Share
+               </Button>
+               </div>
               ) : (
-                ""
+               ""
               )}
-              {file !== "No File Chosen" && dwnldLink.length === 0 ? (
-                <Button
-                  className="btn btn-primary w-96 my-2"
-                  onClick={handlerClick}
-                >
-                  {btntxt}
-                </Button>
-              ) : (
-                ""
-              )}
-              {dwnldLink.length > 0 ? (
-                <Button
-                  className="btn btn-primary w-96 my-2"
-                  onClick={ShareClick}
-                >
-                  Share
-                </Button>
-              ) : (
-                ""
-              )}
+             
             </div>
           )}
         </div>
