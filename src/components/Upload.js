@@ -29,8 +29,8 @@ function Upload() {
         return resp.json();
       })
       .then((data) => {
-        // console.log(data);
-        setDwnldLink(data.urlLink);
+        console.log(data);
+        setDwnldLink(data.secure_url);
         setLoading(false);
       })
       .catch((error) => console.log(error));
