@@ -54,7 +54,7 @@ function Upload() {
           <img
             src={filePhoto}
             style={{height:"230px",width:"300px"}}
-            alt="Shoes"
+            alt="Files"
             className="rounded-xl"
           />
         </figure>
