@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from "react";
 import { Button } from "react-daisyui";
-
+import filePhoto from "./filePhoto.png"
 import { useDropzone } from "react-dropzone";
 import Share from "./Share";
 import Spinner from "./Spinner";
@@ -52,7 +52,8 @@ function Upload() {
       <div className="card w-96 ">
         <figure className="py-5 pt-10">
           <img
-            src="https://placeimg.com/400/225/arch"
+            src={filePhoto}
+            style={{height:"230px",width:"300px"}}
             alt="Shoes"
             className="rounded-xl"
           />
